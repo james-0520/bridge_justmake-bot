@@ -52,7 +52,7 @@ class people(Cog_Extension):
                         jdata["player"]=[]
                         with open("background_setting.json",'w',encoding="utf8")as jfile:
                             json.dump(jdata,jfile,indent=4)
-                        Cog_Extension.game_process = "join"
+                        jdata["game_process"] = "join"
                         await msg.channel.send("超過四人，發生錯誤\n將人數歸零，重新開始")
             elif msg.content=="不打了":  #若輸入{不打了}，則把此玩家id從player中移除
                 jdata["player"].remove(msg.author.id)

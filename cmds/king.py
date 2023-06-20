@@ -84,19 +84,19 @@ class king(Cog_Extension):
             for i in player_num:
                 if win_player == i:
                     self.counter = i-2
-            self.pa_people = 0
+
 
             
             if self.king_color in jdata["color"] and 1<=line<=7 and (self.team=="EW" or self.team=="NS"):
                 if self.team=="EW":
-                    self.a_win_edition=line+6
-                    self.b_win_edition=14-self.a_win_edition
-                    await ctx.channel.send(F"王牌花色是{self.king_color}\n東西家要拿{self.a_win_edition}墩，南北家要拿{self.b_win_edition}墩")
+                    self.EW_win_edition=line+6
+                    self.NS_win_edition=14-self.EW_win_edition
+                    await ctx.channel.send(F"王牌花色是{self.king_color}\n東西家要拿{self.EW_win_edition}墩，南北家要拿{self.NS_win_edition}墩")
                 
                 elif self.team=="NS":
-                    self.b_win_edition=line+6
-                    self.a_win_edition=14-self.b_win_edition
-                    await ctx.channel.send(F"王牌花色是{self.king_color}\n東西家要拿{self.a_win_edition}墩，南北家要拿{self.b_win_edition}墩")
+                    self.NS_win_edition=line+6
+                    self.EW_win_edition=14-self.NS_win_edition
+                    await ctx.channel.send(F"王牌花色是{self.king_color}\n東西家要拿{self.EW_win_edition}墩，南北家要拿{self.NS_win_edition}墩")
                 
                 
                 if self.king_color=="Middle" or self.king_color=="mini":
@@ -109,6 +109,7 @@ class king(Cog_Extension):
                         for a in range(13): jdata[F"player{player_num[i]}_cards"][a]=jdata[F"sort_back {self.king_color}"][str(sort_list[a])]
                         with open("background_setting.json",'w',encoding="utf8")as jfile:
                             json.dump(jdata,jfile,indent=4)
+
                         message=''
                         for card in jdata[F"player{player_num[i]}_cards"]: message+=F"{card},"
                         user=await self.bot.fetch_user(jdata["player"][player_num[i]])
@@ -120,17 +121,12 @@ class king(Cog_Extension):
                             json.dump(jdata,jfile,indent=4)
                 
                 self.channel=ctx.channel
-                self.a_wincount,self.b_wincount=0,0
+                self.EW_wincount,self.NS_wincount=0,0
                 self.cards=[]
+                jdata["game_process"] = "playing"
             else : await ctx.channel.send("你真的要這樣打牌嗎?")
 
 
-    @commands.Cog.listener()
-    async def on_message(self,msg):
-        if msg.content == "pass":
-            self.pa_people += 1
-            if self.pa_people == 3:#3家pass
-                Cog_Extension.game_process = "playing"
 
 
     @commands.Cog.listener()
@@ -144,6 +140,7 @@ class king(Cog_Extension):
             if self.counter==4: self.counter=0
             with open ("background_setting.json",'r',encoding="utf8") as jfile:
                 jdata=json.load(jfile)
+
             player=await self.bot.fetch_user(jdata["player"][self.counter])
             if msg.content in jdata["poker"] and msg.author==player:
                 if msg.content in jdata[F"player{player_num[self.counter]}_cards"]:
@@ -159,20 +156,23 @@ class king(Cog_Extension):
                     await msg.channel.send("你要不要看看你都打了什麼")
                     self.counter-=1 #回到原本的人
             else : self.counter-=1
+
+            
             if len(self.cards)==4:#出完一輪
                 trick_win=king.judge(self,self.cards)
                 trick_win-=(self.counter+1)
                 if trick_win<=-1: trick_win+=4
-                if trick_win==0 or trick_win==2: self.a_wincount+=1
-                elif trick_win==1 or trick_win==3: self.b_wincount+=1
+                if trick_win==0 or trick_win==2: self.EW_wincount+=1
+                elif trick_win==1 or trick_win==3: self.NS_wincount+=1
                 winner=await self.bot.fetch_user(jdata["player"][trick_win])
-                await self.channel.send(F"{winner}贏了這一墩\n目前東西家拿了{self.a_wincount}墩，還要拿{self.a_win_edition-self.a_wincount}\n目前南北家拿了{self.b_wincount}墩，還要拿{self.b_win_edition-self.b_wincount}")
+                await self.channel.send(F"{winner}贏了這一墩\n目前東西家拿了{self.EW_wincount}墩，還要拿{self.EW_win_edition-self.EW_wincount}\n目前南北家拿了{self.NS_wincount}墩，還要拿{self.NS_win_edition-self.NS_wincount}")
+
                 #重置
                 self.cards=[]
                 self.counter=trick_win-1
 
                 #結束
-                if self.a_wincount==self.a_win_edition:
+                if self.EW_wincount==self.EW_win_edition:
                     await self.channel.send("遊戲結束，東西家勝利")
                     jdata["player"]=[]
                     for i in range(4):
@@ -181,7 +181,7 @@ class king(Cog_Extension):
                     with open("background_setting.json",'w',encoding="utf8")as jfile:
                         json.dump(jdata,jfile,indent=4)
                     self.count_win=False
-                elif self.b_wincount==self.b_win_edition:
+                elif self.NS_wincount==self.b_win_edition:
                     await self.channel.send("遊戲結束，南北家勝利")
                     jdata["player"]=[]
                     for i in range(4):
@@ -190,6 +190,7 @@ class king(Cog_Extension):
                     with open("background_setting.json",'w',encoding="utf8")as jfile:
                         json.dump(jdata,jfile,indent=4)
                     self.count_win=False
+                    
                 #繼續
                 else:
                     for i in range(4):

@@ -1,71 +1,22 @@
 {
     "game_process": "join",
     "player": [
-        740501874985140254,
-        740501874985140254
+        
     ],
     "playerE_cards": [
-        "club 2",
-        "club 5",
-        "club 7",
-        "diamond 4",
-        "diamond 9",
-        "diamond J",
-        "diamond K",
-        "heart 5",
-        "heart 9",
-        "space 3",
-        "space 4",
-        "space 7",
-        "space A"
+        
     ],
     "playerE_id": 0,
     "playerS_cards": [
-        "club 8",
-        "club 10",
-        "club K",
-        "club A",
-        "diamond 8",
-        "diamond 10",
-        "diamond Q",
-        "heart 2",
-        "heart Q",
-        "space 5",
-        "space 6",
-        "space Q",
-        "space K"
+        
     ],
     "playerS_id": 0,
     "playerW_cards": [
-        "club 3",
-        "club 4",
-        "club 6",
-        "club 9",
-        "club J",
-        "club Q",
-        "diamond A",
-        "heart 6",
-        "heart J",
-        "heart K",
-        "space 9",
-        "space 10",
-        "space J"
+        
     ],
     "playerW_id": 0,
     "playerN_cards": [
-        "diamond 2",
-        "diamond 3",
-        "diamond 5",
-        "diamond 6",
-        "diamond 7",
-        "heart 3",
-        "heart 4",
-        "heart 7",
-        "heart 8",
-        "heart 10",
-        "heart A",
-        "space 2",
-        "space 8"
+        
     ],
     "playerN_id": 0,
     "poker": [
