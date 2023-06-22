@@ -49,4 +49,4 @@ for filename in os.listdir('cmds'):
 
 if __name__ == "__main__":
 	#keep_alive.keep_alive()
-	bot.run("MTExMDU2NDAxMjcxMTc1MTY4MA.GeII3k.o-wo5YEjFYEkFMRA2asUK2hjI3JjgrTrWiPCEA")
+	bot.run("")
