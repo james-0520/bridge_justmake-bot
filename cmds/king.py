@@ -24,7 +24,7 @@ class king(Cog_Extension):
             for i in player_num:
                 if win_player == i:
                     self.counter = i-2
-            if win_player <=1:
+            if 0 <= win_player <=1:
                 jdata["dream"] = win_player+2
             elif 2 <=win_player <=3:
                 jdata["dream"] = win_player-2
@@ -71,3 +71,6 @@ class king(Cog_Extension):
                 self.cards=[]
                 jdata["game_process"] = "playing"
             else : await ctx.channel.send("你真的要這樣打牌嗎?")
+
+async def setup(bot):
+    await bot.add_cog(king(bot)) 

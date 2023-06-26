@@ -52,8 +52,9 @@ class people(Cog_Extension):
                         jdata["player"]=[]
                         with open("background_setting.json",'w',encoding="utf8")as jfile:
                             json.dump(jdata,jfile,indent=4)
-                        jdata["game_process"] = "join"
+                        jdata["game_process"]= "join"
                         await msg.channel.send("超過四人，發生錯誤\n將人數歸零，重新開始")
+                        
             elif msg.content=="不打了":  #若輸入{不打了}，則把此玩家id從player中移除
                 jdata["player"].remove(msg.author.id)
                 self.people-=1
@@ -78,5 +79,5 @@ class people(Cog_Extension):
         #花色:mini,club,diamond,Middle,heart,space,No_King
         #ex:[set 3 No_King b 2(注意每項輸入間有空格)
         #4.出牌方式為在頻道上把自己要打的牌用訊息送出""")
-def setup(bot):
-    bot.add_cog(people(bot))
+async def setup(bot):
+    await bot.add_cog(people(bot))

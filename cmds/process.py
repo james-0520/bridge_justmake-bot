@@ -76,21 +76,30 @@ class process(Cog_Extension):
             jdata=json.load(jfile)
         if jdata["game_process"]=="playing" and msg.author!=self.bot.user:
             self.counter+=1  #第幾個人
-            if self.counter==4: self.counter=0
-            
+            if self.counter == jdata["dream"]:#判斷是否輪到夢家
+                dreamer = jdata["dream"]
+                dream_play = True
+                self.counter +=2
+            if self.counter>=4: self.counter-=4
             with open ("background_setting.json",'r',encoding="utf8") as jfile:
                 jdata=json.load(jfile)
             player=await self.bot.fetch_user(jdata["player"][self.counter])
             if msg.content in jdata["poker"] and msg.author==player:
-                if msg.content in jdata[F"player{player_num[self.counter]}_cards"]:
+                if (msg.content in jdata[F"player{player_num[self.counter]}_cards"]) or (msg.content in jdata[F"player{dreamer}_cards"] and dream_play == True):
                     content=msg.content
                     self.cards.append(content)
                     jdata[F"player{self.counter}_cards"].remove(content)
                     with open("background_setting.json",'w',encoding="utf8")as jfile:
                         json.dump(jdata,jfile,indent=4)
                     if len(self.cards)!=4: 
+                        if dream_play == True:
+                            dream_play = False
+                            self.counter -=2
+                            if self.counter <0:
+                                self.counter +=4
+
                         if self.counter==3:self.counter-=4
-                        await msg.channel.send(F"輪到{player_num[self.counter+2]}號玩家出牌")#下一個人
+                        await msg.channel.send(F"輪到{player_num[self.counter+2]}家出牌")#下一個人
                 else: 
                     await msg.channel.send("你要不要看看你都打了什麼")
                     self.counter-=1 #回到原本的人
@@ -145,5 +154,5 @@ class process(Cog_Extension):
                         with open("background_setting.json",'w',encoding="utf8")as jfile:
                             json.dump(jdata,jfile,indent=4)
 
-def setup(bot):
-    bot.add_cog(process(bot)) 
+async def setup(bot):
+    await bot.add_cog(process(bot)) 

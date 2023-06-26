@@ -38,9 +38,6 @@ class distribution(Cog_Extension):
                 with open("background_setting.json",'w',encoding="utf8")as jfile:
                     json.dump(jdata,jfile,indent=4)
                 print(jdata[F"player{player_num[i]}_id"])
-
-            Cog_Extension.getcard=True
-            Cog_Extension.startplaying=True
             print ("OK")
 
             for init_color in ["club","diamond","heart","space"]:
@@ -57,5 +54,5 @@ class distribution(Cog_Extension):
             jdata["game_process"] = "setking"
 
 
-def setup(bot):
-    bot.add_cog(distribution(bot))
+async def setup(bot):
+    await bot.add_cog(distribution(bot))

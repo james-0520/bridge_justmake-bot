@@ -4,6 +4,7 @@ import json
 import os
 from core.classes import Cog_Extension
 import keep_alive
+import asyncio
 
 #開啟json檔
 with open('background_setting.json', "r", encoding="utf8") as jfile:
@@ -42,11 +43,22 @@ async def message(ctx, id):
 	await context.delete()
 
 
-for filename in os.listdir('cmds'):
-	if filename.endswith(".py"):
-		bot.load_extension(F"cmds.{filename[:-3]}")#去掉.py
-		print('loaded')
 
-if __name__ == "__main__":
+async def load_extensions():
+	for filename in os.listdir('./cmds'):
+		if filename.endswith(".py"):
+			await bot.load_extension(F"cmds.{filename[:-3]}")#去掉.py
+			print('loaded')
+
+
+async def main():
+	async with bot:
+		await load_extensions()
+		await bot.start("")
+
+asyncio.run(main())
+
+
 	#keep_alive.keep_alive()
-	bot.run("")
+	
+

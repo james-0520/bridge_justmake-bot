@@ -70,10 +70,6 @@ class start(Cog_Extension):
             await self.channel.send(F"{win}贏了這一墩\n目前a隊拿了{a_wincount}墩，還要拿{self.a_win_edition-a_wincount}\n目前b隊拿了{b_wincount}墩，還要拿{self.a_win_edition-a_wincount}")
             
 
-    
 
-
-
-
-def setup(bot):
-    bot.add_cog(start(bot))
+async def setup(bot):
+    await bot.add_cog(start(bot))
