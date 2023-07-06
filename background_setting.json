@@ -1,27 +1,19 @@
 {
     "game_process": "join",
-    "player": [
-        
-    ],
-    "playerE_cards": [
-        
-    ],
+    "game_mode": "",
+    "bridge_player": [],
+    "jm_player": [],
+    "playerE_cards": [],
     "playerE_id": 0,
-    "playerS_cards": [
-        
-    ],
+    "playerS_cards": [],
     "playerS_id": 0,
-    "playerW_cards": [
-        
-    ],
+    "playerW_cards": [],
     "playerW_id": 0,
-    "playerN_cards": [
-        
-    ],
+    "playerN_cards": [],
     "playerN_id": 0,
-
-    "dream":0,
-
+    "dream": 0,
+    "call_trick": [0,0,0,0],
+    "win_trick":[0,0,0,0],
     "poker": [
         "club A",
         "club 2",
@@ -83,6 +75,13 @@
         "space",
         "mini",
         "Middle",
+        "No_King"
+    ],
+    "select_king": [
+        "club",
+        "diamond",
+        "heart",
+        "space",
         "No_King"
     ],
     "normal": {

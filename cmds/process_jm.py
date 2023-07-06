@@ -4,9 +4,10 @@ import json
 from discord.ext.commands.cog import Cog
 from core.classes import Cog_Extension
 import random
+import time
 
 
-class process(Cog_Extension):
+class process_jm(Cog_Extension):
     def compare(self,list):#傳入list後，挑出其中最大數字的引數
         a=0
         max=0
@@ -64,42 +65,33 @@ class process(Cog_Extension):
                     each_number[i] += 13
                 elif temp_color != self.king_color or temp_color != round_color:
                     each_number[i] = 0
-        win=process.compare(self,each_number)
+        win=process_jm.compare(self,each_number)
         return win
 
 
     @commands.Cog.listener()
     async def on_message(self,msg):
         player_num = "ESWN"
+        player_num_cn = "東南西北"
 
-        with open ("background_setting.json",'r',encoding="utf8") as jfile:
+
+        with open ("background_setting.json",'r',encoding="utf8") as jfile:  #order: 2301 1230
             jdata=json.load(jfile)
-        if jdata["game_process"]=="playing_bridge" and msg.author!=self.bot.user:
-            self.counter+=1  #第幾個人
-            if self.counter == jdata["dream"]:#判斷是否輪到夢家
-                dreamer = jdata["dream"]
-                dream_play = True
-                self.counter +=2
-            if self.counter>=4: self.counter-=4
-            with open ("background_setting.json",'r',encoding="utf8") as jfile:
-                jdata=json.load(jfile)
+        if jdata["game_process"]=="playing_jm" and msg.author!=self.bot.user:
+            self.counter += 1
+            if self.counter == 4:   self.counter -= 4
             player=await self.bot.fetch_user(jdata["player"][self.counter])
-            if msg.content in jdata["poker"] and msg.author==player:
-                if (msg.content in jdata[F"player{player_num[self.counter]}_cards"]) or (msg.content in jdata[F"player{dreamer}_cards"] and dream_play == True):
+            if msg.content in jdata["poker"] and msg.author == player:
+                if msg.content in jdata[F"player{player_num[self.counter]}_cards"]:
                     content=msg.content
                     self.cards.append(content)
-                    jdata[F"player{self.counter}_cards"].remove(content)
+                    jdata[F"player{player_num[self.counter]}_cards"].remove(content)
                     with open("background_setting.json",'w',encoding="utf8")as jfile:
                         json.dump(jdata,jfile,indent=4)
-                    if len(self.cards)!=4: 
-                        if dream_play == True:
-                            dream_play = False
-                            self.counter -=2
-                            if self.counter <0:
-                                self.counter +=4
-
-                        if self.counter==3:self.counter-=4
-                        await msg.channel.send(F"輪到{player_num[self.counter+1]}家出牌")#下一個人
+                    if len(self.cards)!=4: #還沒出完
+                        if self.counter == 3 :self.counter -= 4
+                        await msg.channel.send(F"輪到{player_num_cn[self.counter+1]}家出牌")#下一個人
+                        time.sleep(0.2)
                 else: 
                     await msg.channel.send("你要不要看看你都打了什麼")
                     self.counter-=1 #回到原本的人
@@ -107,22 +99,23 @@ class process(Cog_Extension):
 
             
             if len(self.cards)==4:#出完一輪
-                trick_win=process.judge(self,self.cards)
-                trick_win-=(self.counter+1)
+                trick_win=process_jm.judge(self,self.cards)
+                trick_win-=(self.counter+1) #回推贏家(card是照出牌順序排列)
                 if trick_win<=-1: trick_win+=4
-                if trick_win==0 or trick_win==2: self.EW_wincount+=1
-                elif trick_win==1 or trick_win==3: self.NS_wincount+=1
+                jdata["win_trick"][trick_win] += 1#贏的加1
                 winner=await self.bot.fetch_user(jdata["player"][trick_win])
-                dreamcard = jdata[F"player{player_num[dreamer]}_cards"]
-                await self.channel.send(F"{winner}贏了這一墩\n目前東西家拿了{self.EW_wincount}墩，還要拿{self.EW_win_edition-self.EW_wincount}\n目前南北家拿了{self.NS_wincount}墩，還要拿{self.NS_win_edition-self.NS_wincount}")
-                await self.channel.send(F"夢家剩餘牌: {dreamcard}")
-
+                await self.channel.send(F'{winner}贏了這一墩  目前墩數\n   北家:{jdata["win_trick"][3]}/{jdata["call_trick"][3]}\n西家:{jdata["win_trick"][2]}/{jdata["call_trick"][2]}     東家:{jdata["win_trick"][0]}/{jdata["call_trick"][0]}\n   南家:{jdata["win_trick"][1]}/{jdata["call_trick"][1]}\n') 
+                await self.channel.send(F"輪到{player_num_cn[trick_win]}家出牌")
+                self.trickcount += 1
+                with open("background_setting.json",'w',encoding="utf8")as jfile:
+                    json.dump(jdata,jfile,indent=4)
+                    
                 #重置
                 self.cards=[]
-                self.counter=trick_win-1
+                self.counter=trick_win-1#跑下一次會再加1
 
                 #結束
-                if self.EW_wincount==self.EW_win_edition:
+                if self.trickcount == 13:
                     await self.channel.send("遊戲結束，東西家勝利")
                     jdata["player"]=[]
                     for i in range(4):
@@ -131,20 +124,13 @@ class process(Cog_Extension):
                     with open("background_setting.json",'w',encoding="utf8")as jfile:
                         json.dump(jdata,jfile,indent=4)
                     self.count_win=False
-                elif self.NS_wincount==self.NS_win_edition:
-                    await self.channel.send("遊戲結束，南北家勝利")
-                    jdata["player"]=[]
-                    for i in range(4):
-                        jdata[F"player{player_num[i]}_cards"]=[]
-                    jdata["join"]="True"
-                    with open("background_setting.json",'w',encoding="utf8")as jfile:
-                        json.dump(jdata,jfile,indent=4)
-                    self.count_win=False
-
-                #繼續
+                    self.set_people = 0
+                    self.trickcount = 0
+                
+                #下一墩準備
                 else:
                     for i in range(4):
-                        with open ("background_setting.json",'r',encoding="utf8") as jfile:
+                        with open ("background_setting.json",'r',encoding="utf8") as jfile:#載入出牌後各家牌
                             jdata=json.load(jfile)
                         message=''
                         for card in jdata[F"player{player_num[i]}_cards"]: message+=F"{card},"
@@ -157,4 +143,4 @@ class process(Cog_Extension):
                             json.dump(jdata,jfile,indent=4)
 
 async def setup(bot):
-    await bot.add_cog(process(bot)) 
+    await bot.add_cog(process_jm(bot)) 

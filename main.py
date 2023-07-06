@@ -10,6 +10,15 @@ import asyncio
 with open('background_setting.json', "r", encoding="utf8") as jfile:
 	jdata = json.load(jfile)
 
+with open('background_setting.json', "w", encoding="utf8") as jfile:
+	jdata["bridge_player"] = []
+	jdata["jm_player"] = []
+	jdata["poker"] = []
+	for init_color in ["club","diamond","heart","space"]:
+		for init_num in ["A","2","3","4","5","6","7","8","9","10","J","Q","K"]:           
+			jdata["poker"].append(f"{init_color} {init_num}")
+	jdata["win_trick"] = [0,0,0,0]
+
 #前綴詞為[
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="[",intents = intents)
@@ -54,7 +63,7 @@ async def load_extensions():
 async def main():
 	async with bot:
 		await load_extensions()
-		await bot.start("")
+		await bot.start("MTExMDU2NDAxMjcxMTc1MTY4MA.GVqHoU.mtAyAcW58eJSy6wUNjvqMciV5BIFBM9DTvzfAk")
 
 asyncio.run(main())
 

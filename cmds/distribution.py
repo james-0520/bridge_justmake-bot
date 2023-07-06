@@ -51,7 +51,10 @@ class distribution(Cog_Extension):
             self.join=True
             with open("background_setting.json",'w',encoding="utf8")as jfile:
                 json.dump(jdata,jfile,indent=4)
-            jdata["game_process"] = "setking"
+            if jdata["game_mode"] == "bridge":
+                jdata["game_process"] = "setking"
+            elif jdata["game_mode"] == "jm":
+                jdata["game_process"] = "select_king"
 
 
 async def setup(bot):

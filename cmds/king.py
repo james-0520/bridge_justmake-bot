@@ -9,7 +9,7 @@ with open ("background_setting.json",'r',encoding="utf8") as jfile:
     jdata=json.load(jfile)
 
 class king(Cog_Extension):
-    @commands.command()#待做:1.改成贏敦的人先出 2.出過的牌削掉 3.判斷遊戲輸贏 4.玩家超過五人 5.奇怪訊息處理
+    @commands.command()
     async def setking(self,ctx,line:int,king_color,team,win_player:str):
         #初始設定
         with open ("background_setting.json",'r',encoding="utf8") as jfile:
@@ -69,8 +69,37 @@ class king(Cog_Extension):
                 self.channel=ctx.channel
                 self.EW_wincount,self.NS_wincount=0,0
                 self.cards=[]
-                jdata["game_process"] = "playing"
+                jdata["game_process"] = "playing_bridge"
+                with open("background_setting.json",'w',encoding="utf8")as jfile:
+                    json.dump(jdata,jfile,indent=4)
             else : await ctx.channel.send("你真的要這樣打牌嗎?")
+
+    def select_king(self):
+        if jdata["game_process"] == "select_king":
+            self.king_color = random.choice(jdata["select_king"])
+            jdata["game_process"] == "settrick"
+            with open("background_setting.json",'w',encoding="utf8")as jfile:
+                json.dump(jdata,jfile,indent=4)
+            
+            
+
+    @commands.command()
+    async def settrick(self,ctx,trick:int,player):
+        
+        if jdata["game_process"] == "settrick":
+            if player in "ESWN":
+                for i in range(4):
+                    if player == "ESWN"[i]:
+                        jdata["call_trick"][i] = trick
+                        self.set_people += 1
+                if self.set_people == 4:
+                    jdata["game_process"] = "playing_jm"
+                    
+                    with open("background_setting.json",'w',encoding="utf8")as jfile:
+                        json.dump(jdata,jfile,indent=4)
+            else:   await ctx.channel.send("查無此風，請重打一次")
+                
+
 
 async def setup(bot):
     await bot.add_cog(king(bot)) 
